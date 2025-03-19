@@ -2,24 +2,24 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"net"
+	"strings"
 )
 
 func Serve() {
 	listener, err := net.Listen("tcp", "localhost:80")
 	if err != nil {
-		fmt.Println("Error: ", err)
+		audit.error(err.Error())
 		return
 	}
 	defer listener.Close()
 
-	fmt.Println("Server is listening on port 80")
+	audit.info("Server listening on port 80")
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("Error: ", err)
+			audit.error(err.Error())
 			continue
 		}
 
@@ -28,7 +28,7 @@ func Serve() {
 }
 
 func handleClient(conn net.Conn) {
-	fmt.Println("Received request from " + conn.LocalAddr().String())
+	audit.info("Received request from " + conn.LocalAddr().String())
 	reader := bufio.NewReader(conn)
 	var requestLines []string
 	for {
@@ -38,8 +38,6 @@ func handleClient(conn net.Conn) {
 		}
 		requestLines = append(requestLines, line)
 	}
-	for i := 0; i < len(requestLines); i += 1 {
-		fmt.Print(requestLines[i])
-	}
+	audit.info(strings.Join(requestLines, "\n"))
 	defer conn.Close()
 }
