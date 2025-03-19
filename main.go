@@ -1,5 +1,5 @@
-package gobalance
+package main
 
 func main() {
-
+	Serve()
 }
