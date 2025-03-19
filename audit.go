@@ -18,7 +18,7 @@ type AuditType int
 
 func NewAudit() *Audit {
 	a := new(Audit)
-	a.logger = *log.New(os.Stderr, "[LOG] ", 0)
+	a.logger = *log.New(os.Stderr, "", 0)
 	return a
 }
 
