@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"net"
-	"strings"
 )
 
 func Serve() {
@@ -29,15 +28,13 @@ func Serve() {
 
 func handleClient(conn net.Conn) {
 	audit.info("Received request from " + conn.LocalAddr().String())
+	buff := make([]byte, 1024)
 	reader := bufio.NewReader(conn)
-	var requestLines []string
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil || line == "\r\n" {
-			break
-		}
-		requestLines = append(requestLines, line)
+	size, err := reader.Read(buff)
+	if err != nil {
+		audit.error("Couldn't read request")
+		return
 	}
-	audit.info(strings.Join(requestLines, "\n"))
+	audit.info((string)(buff[:size]))
 	defer conn.Close()
 }
