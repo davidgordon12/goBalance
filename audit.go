@@ -36,16 +36,16 @@ func (audit *Audit) addFile(path string) {
 }
 
 func (audit *Audit) info(msg string) {
-	logg("INFO", msg)
+	go logg("INFO", msg)
 }
 
 func (audit *Audit) warn(msg string) {
-	logg("WARNING", msg)
+	go logg("WARNING", msg)
 }
 
 func (audit *Audit) error(msg string) {
 	/* Send some sort of alert here as well eventually */
-	logg("ERROR", msg)
+	go logg("ERROR", msg)
 }
 
 func logg(step, msg string) {
