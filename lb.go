@@ -6,6 +6,13 @@ import (
 	"net/http"
 )
 
+var serverIndex = 0
+var serverPool = []string{
+	"http://127.0.0.1:5001",
+	"http://127.0.0.1:5002",
+	"http://127.0.0.1:5003",
+}
+
 func Serve() {
 	listener, err := net.Listen("tcp", "localhost:80")
 	if err != nil {
@@ -49,7 +56,8 @@ func handleClient(conn net.Conn) {
 }
 
 func forwardRequest() []byte {
-	resp, err := http.Get("http://localhost:5000")
+	serverIndex = (serverIndex + 1) % len(serverPool)
+	resp, err := http.Get(serverPool[serverIndex])
 	if err != nil {
 		audit.error("Couldn't forward request " + err.Error())
 		return nil
