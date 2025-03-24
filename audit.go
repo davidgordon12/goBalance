@@ -21,7 +21,7 @@ type AuditType int
 
 func NewAudit() *Audit {
 	a := new(Audit)
-	a.logger = *log.New(os.Stderr, time.Now().UTC().Format("[2006-01-02 15:04:05] "), 0)
+	a.logger = *log.New(os.Stderr, "", 0)
 	return a
 }
 
@@ -51,5 +51,5 @@ func (audit *Audit) error(msg string) {
 func logg(step, msg string) {
 	pattern, _ := regexp.Compile("\r?\n")
 	msg = pattern.ReplaceAllString(msg, " ")
-	audit.logger.Printf("%s: %s", step, msg)
+	audit.logger.Printf("%s %s: %s", time.Now().UTC().Format("[2006-01-02 15:04:05] "), step, msg)
 }
