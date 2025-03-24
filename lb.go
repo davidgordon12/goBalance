@@ -2,37 +2,66 @@ package main
 
 import (
 	"bufio"
+	"net"
 	"net/http"
 )
 
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	audit.info("/ request received from " + r.RemoteAddr)
-	audit.info(r.Pattern + " " + r.Method + " " + r.Proto + " Host: " + r.Host + " User-Agent: " + r.UserAgent())
-	result, err := http.Get("http://localhost:5000/")
+func Serve() {
+	listener, err := net.Listen("tcp", "localhost:80")
 	if err != nil {
 		audit.error(err.Error())
 		return
 	}
-	defer result.Body.Close()
-	buffer := make([]byte, 1024)
-	reader := bufio.NewReader(result.Body)
-	size, err := reader.Read(buffer)
-	if err != nil {
-		audit.error(err.Error())
-		return
+	defer listener.Close()
+
+	audit.info("Server listening on port 80")
+
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			audit.error(err.Error())
+			continue
+		}
+
+		go handleClient(conn)
 	}
-	w.Write(buffer[:size])
 }
 
-func Serve() {
-	go http.HandleFunc("/", getRoot)
+func handleClient(conn net.Conn) {
+	defer conn.Close()
 
-	err := http.ListenAndServe(":3000", nil)
+	audit.info("Received request from " + conn.LocalAddr().String())
 
+	reader := bufio.NewReader(conn)
+	buff := make([]byte, 1024)
+	size, err := reader.Read(buff)
 	if err != nil {
-		audit.error(err.Error())
+		audit.error("Couldn't read request " + err.Error())
 		return
 	}
 
-	audit.info("Server listening on port 3000")
+	audit.info((string)(buff[:size]))
+
+	resp := forwardRequest()
+
+	conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+	conn.Write(resp)
+}
+
+func forwardRequest() []byte {
+	resp, err := http.Get("http://localhost:5000")
+	if err != nil {
+		audit.error("Couldn't forward request " + err.Error())
+		return nil
+	}
+
+	buff := make([]byte, 32000)
+	httpReader := bufio.NewReader(resp.Body)
+	size, err := httpReader.Read(buff)
+	if err != nil {
+		audit.error("Couldn't read request " + err.Error())
+		return nil
+	}
+
+	return buff[:size]
 }
