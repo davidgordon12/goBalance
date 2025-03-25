@@ -1,7 +1,3 @@
-/*
-I may make this into a standalone lib in the future for my self.
-But for now it will be apart of this project. Just a log wrapper.
-*/
 package main
 
 import (
