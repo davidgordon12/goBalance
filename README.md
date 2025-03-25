@@ -1,3 +1,3 @@
 # Application layer load balancer written in GO
 
-In progress
+A simple, "configurable" round-robin load balancer

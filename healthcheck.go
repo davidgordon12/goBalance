@@ -21,9 +21,7 @@ func performHealthcheck() {
 			audit.info("Removing unhealthy server from pool " + serverPool[i])
 			addServer(serverPool[i], &unhealthyServers)
 			popServer(serverPool[i], &serverPool)
-			if len(serverPool) > 0 {
-				i -= 1
-			}
+			i -= 1
 		}
 	}
 
