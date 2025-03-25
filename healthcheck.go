@@ -22,6 +22,9 @@ func performHealthcheck() {
 			addServer(serverPool[i], &unhealthyServers)
 			popServer(serverPool[i], &serverPool)
 			i -= 1
+			if len(serverPool) == 0 {
+				break
+			}
 		}
 	}
 
